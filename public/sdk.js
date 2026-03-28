@@ -67,13 +67,11 @@
   // Track browser back/forward navigation.
   window.addEventListener("popstate", trackRoute);
 
-  // Send error + recent events to backend when a JS error occurs.
-  window.onerror = function (message, source, lineno, colno, error) {
-    console.log("[sdk] window.onerror triggered:", message);
+  function sendErrorToBackend(errorInfo) {
     var payload = {
       error: {
-        message: String(message || ""),
-        stack: error && error.stack ? String(error.stack) : ""
+        message: String(errorInfo.message || ""),
+        stack: String(errorInfo.stack || "")
       },
       events: events.slice()
     };
@@ -88,8 +86,43 @@
         console.log("[sdk] /api/log response status:", res.status);
       })
       .catch(function (err) {
-      // Ignore network errors to avoid breaking the app.
+        // Ignore network errors to avoid breaking the app.
         console.log("[sdk] failed to send /api/log:", err);
       });
+  }
+
+  // Synchronous errors and classic script errors (not promise rejections).
+  window.onerror = function (message, source, lineno, colno, error) {
+    console.log("[sdk] window.onerror triggered:", message);
+    sendErrorToBackend({
+      message: message || (error && error.message) || "",
+      stack: error && error.stack ? error.stack : ""
+    });
   };
+
+  // Uncaught rejections: throws inside .then(), async/await without try/catch, etc.
+  // window.onerror does not run for these in modern browsers.
+  window.addEventListener("unhandledrejection", function (event) {
+    var reason = event.reason;
+    var message = "";
+    var stack = "";
+    if (reason != null) {
+      if (typeof reason === "string") {
+        message = reason;
+      } else if (reason instanceof Error) {
+        message = reason.message || String(reason);
+        stack = reason.stack || "";
+      } else {
+        try {
+          message = String(reason);
+        } catch (e) {
+          message = "unhandledrejection";
+        }
+      }
+    } else {
+      message = "unhandledrejection";
+    }
+    console.log("[sdk] unhandledrejection:", message);
+    sendErrorToBackend({ message: message, stack: stack });
+  });
 })();

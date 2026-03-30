@@ -1,5 +1,6 @@
 services:
-  mongodb:
+  # Nome do serviço "mongo" coincide com o default do mongo-express (host na rede Docker)
+  mongo:
     image: mongo:7
     container_name: breadcrumbs-mongodb
     ports:
@@ -8,6 +9,20 @@ services:
       - mongodb_data:/data/db
     environment:
       MONGO_INITDB_DATABASE: breadcrumbs
+
+  # Web UI: http://localhost:8081
+  mongo-express:
+    image: mongo-express:1
+    container_name: breadcrumbs-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongo
 
 volumes:
   mongodb_data:

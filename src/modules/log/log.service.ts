@@ -9,4 +9,8 @@ export class LogService {
         : { userAgent };
     await Log.create(doc);
   }
+
+  async getLogById(id: string): Promise<InstanceType<typeof Log> | null> {
+    return Log.findById(id).exec();
+  }
 }

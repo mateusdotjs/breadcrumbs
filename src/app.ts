@@ -4,13 +4,20 @@ import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { registerLogRoutes } from "./modules/log/log.routes.js";
+import cors from "@fastify/cors";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const app = Fastify({ logger: true });
 
+await app.register(cors, {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
+
 registerLogRoutes(app);
 
 await app.register(fastifyStatic, {
-  root: path.join(__dirname, "../public")
+  root: path.join(__dirname, "../public"),
 });

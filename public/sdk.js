@@ -2,6 +2,7 @@
 (function () {
   var events = [];
   var MAX_EVENTS = 20;
+  var INGEST_URL = "http://localhost:3000/api/log";
 
   // Adds an event to memory and keeps only the latest 20 (FIFO).
   function addEvent(type, data) {
@@ -76,18 +77,18 @@
       events: events.slice()
     };
 
-    console.log("[sdk] sending payload to /api/log:", payload);
-    fetch("/api/log", {
+    console.log("[sdk] sending payload to", INGEST_URL, payload);
+    fetch(INGEST_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
       .then(function (res) {
-        console.log("[sdk] /api/log response status:", res.status);
+        console.log("[sdk] ingest response status:", res.status);
       })
       .catch(function (err) {
         // Ignore network errors to avoid breaking the app.
-        console.log("[sdk] failed to send /api/log:", err);
+        console.log("[sdk] failed to send payload:", err);
       });
   }
 

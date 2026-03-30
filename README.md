@@ -79,7 +79,7 @@ This starts MongoDB on `localhost:27017` using the settings in `docker-compose.y
 
 ## API
 
-### `POST /api/log`
+### `POST /api/v1/log`
 
 Receives an error payload with breadcrumb events and stores it in MongoDB (`logs` collection).
 

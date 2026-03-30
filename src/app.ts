@@ -16,7 +16,10 @@ await app.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
-registerLogRoutes(app);
+// Global API prefix (v1).
+await app.register(async (apiV1) => {
+  registerLogRoutes(apiV1);
+}, { prefix: "/api/v1" });
 
 await app.register(fastifyStatic, {
   root: path.join(__dirname, "../public"),

@@ -2,14 +2,15 @@
 (function () {
   var events = [];
   var MAX_EVENTS = 20;
-  var INGEST_URL = "http://localhost:3000/api/log";
+  var BASE_ORIGIN = "http://localhost:3000";
+  var INGEST_URL = BASE_ORIGIN + "/api/v1/log";
 
   // Adds an event to memory and keeps only the latest 20 (FIFO).
   function addEvent(type, data) {
     events.push({
       type: type,
       timestamp: Date.now(),
-      data: data || {}
+      data: data || {},
     });
 
     if (events.length > MAX_EVENTS) {
@@ -32,19 +33,23 @@
 
   // Capture click info early (capture phase) so we still log it
   // even if a click handler throws an error afterward.
-  document.addEventListener("click", function (e) {
-    var el = e.target;
-    if (!el) return;
-    var tag = (el.tagName || "").toLowerCase();
-    if (tag === "html" || tag === "body") return;
+  document.addEventListener(
+    "click",
+    function (e) {
+      var el = e.target;
+      if (!el) return;
+      var tag = (el.tagName || "").toLowerCase();
+      if (tag === "html" || tag === "body") return;
 
-    var text = (el.innerText || "").trim().slice(0, 30);
-    addEvent("click", {
-      tag: tag,
-      text: text,
-      selector: getSelector(el)
-    });
-  }, true);
+      var text = (el.innerText || "").trim().slice(0, 30);
+      addEvent("click", {
+        tag: tag,
+        text: text,
+        selector: getSelector(el),
+      });
+    },
+    true,
+  );
 
   // Capture route changes using location.pathname.
   function trackRoute() {
@@ -72,16 +77,16 @@
     var payload = {
       error: {
         message: String(errorInfo.message || ""),
-        stack: String(errorInfo.stack || "")
+        stack: String(errorInfo.stack || ""),
       },
-      events: events.slice()
+      events: events.slice(),
     };
 
     console.log("[sdk] sending payload to", INGEST_URL, payload);
     fetch(INGEST_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
       .then(function (res) {
         console.log("[sdk] ingest response status:", res.status);
@@ -97,7 +102,7 @@
     console.log("[sdk] window.onerror triggered:", message);
     sendErrorToBackend({
       message: message || (error && error.message) || "",
-      stack: error && error.stack ? error.stack : ""
+      stack: error && error.stack ? error.stack : "",
     });
   };
 

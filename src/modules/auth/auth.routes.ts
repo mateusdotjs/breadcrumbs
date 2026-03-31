@@ -6,5 +6,4 @@ export function registerAuthRoutes(app: FastifyInstance): void {
   const controller = new AuthController(new AuthService());
 
   app.get("/auth/me", controller.me);
-  app.post("/auth/signup", controller.createUser);
 }

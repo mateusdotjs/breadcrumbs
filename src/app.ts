@@ -3,7 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import { clerkPlugin } from "@clerk/fastify";
 import { registerLogRoutes } from "./modules/log/log.routes.js";
+import { registerAuthRoutes } from "./modules/auth/auth.routes.js";
+import { registerUsersRoutes } from "./modules/users/users.routes.js";
+import { registerProjectsRoutes } from "./modules/projects/projects.routes.js";
 import cors from "@fastify/cors";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,8 +20,13 @@ await app.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
+await app.register(clerkPlugin);
+
 // Global API prefix (v1).
 await app.register(async (apiV1) => {
+  registerAuthRoutes(apiV1);
+  registerUsersRoutes(apiV1);
+  registerProjectsRoutes(apiV1);
   registerLogRoutes(apiV1);
 }, { prefix: "/api/v1" });
 

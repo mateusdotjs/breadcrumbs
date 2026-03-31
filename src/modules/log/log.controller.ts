@@ -1,8 +1,11 @@
+import { getAuth } from "@clerk/fastify";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import mongoose from "mongoose";
 import { LogService } from "./log.service.js";
 
 type GetLogParams = { Params: { id: string } };
+type GetLogsByProjectParams = { Params: { projectId: string } };
+type GetLogsBySessionParams = { Params: { sessionId: string } };
 
 export class LogController {
   constructor(private readonly logService: LogService) {}
@@ -39,5 +42,51 @@ export class LogController {
     }
 
     return reply.status(201).send({ ok: true });
+  };
+
+  getLogsByProject = async (
+    request: FastifyRequest<GetLogsByProjectParams>,
+    reply: FastifyReply
+  ): Promise<void> => {
+    const { userId } = getAuth(request);
+    if (!userId) {
+      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+    }
+
+    try {
+      const logs = await this.logService.getLogsByProjectId(request.params.projectId, userId);
+      return reply.send({ ok: true, logs });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "PROJECT_NOT_FOUND_OR_UNAUTHORIZED"
+      ) {
+        return reply.status(404).send({ ok: false, error: "Project not found or unauthorized." });
+      }
+      throw error;
+    }
+  };
+
+  getLogsBySession = async (
+    request: FastifyRequest<GetLogsBySessionParams>,
+    reply: FastifyReply
+  ): Promise<void> => {
+    const { userId } = getAuth(request);
+    if (!userId) {
+      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+    }
+
+    try {
+      const logs = await this.logService.getLogsBySessionId(request.params.sessionId, userId);
+      return reply.send({ ok: true, logs });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "PROJECT_NOT_FOUND_OR_UNAUTHORIZED"
+      ) {
+        return reply.status(404).send({ ok: false, error: "Project not found or unauthorized." });
+      }
+      throw error;
+    }
   };
 }

@@ -7,6 +7,8 @@ export type SdkEvent = {
 
 /** Body of POST /api/v1/log — same structure the client sends on window.onerror. */
 export type SdkLogPayload = {
+  projectId: string;
+  sessionId: string;
   error: {
     message: string;
     stack: string;

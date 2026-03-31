@@ -12,6 +12,8 @@ const sdkEventSchema = new Schema(
 
 const logSchema = new Schema(
   {
+    projectId: { type: String, required: true, index: true },
+    sessionId: { type: String, required: true, index: true },
     error: {
       message: { type: String, required: true },
       stack: { type: String, required: true },

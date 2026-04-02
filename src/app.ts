@@ -14,9 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = Fastify({ logger: true });
 
 await app.register(cors, {
-  origin: "*",
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 });
 
 await app.register(clerkPlugin);

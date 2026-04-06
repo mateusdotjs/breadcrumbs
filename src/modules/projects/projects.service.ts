@@ -3,8 +3,15 @@ import { Project } from "./projects.model.js";
 export class ProjectsService {
   async getByCurrentUser(
     ownerClerkUserId: string,
-  ): Promise<InstanceType<typeof Project>[]> {
-    return Project.find({ ownerClerkUserId }).exec();
+  ): Promise<any[]> {
+    const projects = await Project.find({ ownerClerkUserId }).exec();
+    return projects.map(project => ({
+      id: project._id,
+      name: project.name,
+      userId: project.ownerClerkUserId,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt
+    }));
   }
 
   async create(

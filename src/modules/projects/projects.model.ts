@@ -5,7 +5,6 @@ const projectSchema = new Schema(
     ownerClerkUserId: {
       type: String,
       required: true,
-      unique: true,
       index: true,
     },
     name: { type: String, required: true },

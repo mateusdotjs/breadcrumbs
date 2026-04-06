@@ -3,11 +3,11 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { ProjectsService } from "./projects.service.js";
 import type { CreateProjectBody, UpdateProjectBody } from "./projects.types.js";
 
-type CreateProjectRequest = { Body: CreateProjectBody };
-type UpdateProjectRequest = { Body: UpdateProjectBody };
+type CreateProjectRequest = { Body: CreateProjectBody; };
+type UpdateProjectRequest = { Body: UpdateProjectBody; };
 
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
 
   getByCurrentUser = async (
     request: FastifyRequest,
@@ -18,12 +18,12 @@ export class ProjectsController {
       return reply.status(401).send({ ok: false, error: "Unauthorized." });
     }
 
-    const project = await this.projectsService.getByCurrentUser(userId);
-    if (!project) {
-      return reply.status(404).send({ ok: false, error: "Project not found." });
+    const projects = await this.projectsService.getByCurrentUser(userId);
+    if (!projects || projects.length === 0) {
+      return reply.status(404).send({ ok: false, error: "No projects found." });
     }
 
-    return reply.send({ ok: true, project });
+    return reply.send({ ok: true, projects });
   };
 
   create = async (
@@ -40,20 +40,8 @@ export class ProjectsController {
       return reply.status(400).send({ ok: false, error: "name is required." });
     }
 
-    try {
-      const project = await this.projectsService.create(userId, name);
-      return reply.status(201).send({ ok: true, project });
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === "PROJECT_ALREADY_EXISTS"
-      ) {
-        return reply
-          .status(409)
-          .send({ ok: false, error: "Project already exists for this user." });
-      }
-      throw error;
-    }
+    const project = await this.projectsService.create(userId, name);
+    return reply.status(201).send({ ok: true, project });
   };
 
   updateByCurrentUser = async (

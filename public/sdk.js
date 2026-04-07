@@ -4,6 +4,7 @@
   var MAX_EVENTS = 20;
   var BASE_ORIGIN = "http://localhost:3000";
   var INGEST_URL = BASE_ORIGIN + "/api/v1/log";
+  var STORAGE_KEY = "breadcrumbs_events";
 
   // Extract projectId from the script tag
   var script = document.currentScript;
@@ -19,6 +20,33 @@
   // Generate a unique session ID for this page load
   var sessionId = crypto.randomUUID();
 
+  // Load events from localStorage on initialization
+  function loadEventsFromStorage() {
+    try {
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        events = JSON.parse(stored);
+        console.log(
+          "[breadcrumbs-sdk] loaded",
+          events.length,
+          "events from localStorage",
+        );
+      }
+    } catch (err) {
+      console.log("[breadcrumbs-sdk] failed to load from localStorage:", err);
+      events = [];
+    }
+  }
+
+  // Save events to localStorage
+  function saveEventsToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    } catch (err) {
+      console.log("[breadcrumbs-sdk] failed to save to localStorage:", err);
+    }
+  }
+
   // Adds an event to memory and keeps only the latest 20 (FIFO).
   function addEvent(type, data) {
     events.push({
@@ -30,6 +58,8 @@
     if (events.length > MAX_EVENTS) {
       events.shift();
     }
+
+    saveEventsToStorage();
 
     console.log(
       "[breadcrumbs-sdk] event added:",
@@ -77,6 +107,9 @@
     addEvent("route", { path: path });
     console.log("[breadcrumbs-sdk] route tracked:", path);
   }
+
+  // Initialize events from localStorage
+  loadEventsFromStorage();
 
   // Track first route when page loads.
   trackRoute();

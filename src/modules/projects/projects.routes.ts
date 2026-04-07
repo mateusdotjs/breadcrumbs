@@ -8,4 +8,5 @@ export function registerProjectsRoutes(app: FastifyInstance): void {
   app.get("/projects/me", controller.getByCurrentUser);
   app.post("/projects", controller.create);
   app.put("/projects/me", controller.updateByCurrentUser);
+  app.delete("/projects/:id", controller.delete);
 }

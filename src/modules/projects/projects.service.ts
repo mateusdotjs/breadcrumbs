@@ -31,4 +31,14 @@ export class ProjectsService {
       { new: true, runValidators: true },
     ).exec();
   }
+
+  async deleteByCurrentUser(
+    ownerClerkUserId: string,
+    projectId: string,
+  ): Promise<InstanceType<typeof Project> | null> {
+    return Project.findOneAndDelete({
+      _id: projectId,
+      ownerClerkUserId,
+    }).exec();
+  }
 }

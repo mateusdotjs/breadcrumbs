@@ -5,6 +5,7 @@ import type { CreateProjectBody, UpdateProjectBody } from "./projects.types.js";
 
 type CreateProjectRequest = { Body: CreateProjectBody; };
 type UpdateProjectRequest = { Body: UpdateProjectBody; };
+type DeleteProjectRequest = { Params: { id: string; }; };
 
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) { }
@@ -67,5 +68,27 @@ export class ProjectsController {
     }
 
     return reply.send({ ok: true, project });
+  };
+
+  delete = async (
+    request: FastifyRequest<DeleteProjectRequest>,
+    reply: FastifyReply,
+  ): Promise<void> => {
+    const { userId } = getAuth(request);
+    if (!userId) {
+      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+    }
+
+    const projectId = request.params?.id;
+    if (!projectId) {
+      return reply.status(400).send({ ok: false, error: "Project ID is required." });
+    }
+
+    const project = await this.projectsService.deleteByCurrentUser(userId, projectId);
+    if (!project) {
+      return reply.status(404).send({ ok: false, error: "Project not found." });
+    }
+
+    return reply.send({ ok: true, message: "Project deleted successfully." });
   };
 }

@@ -7,11 +7,11 @@
 
   // Extract projectId from the script tag
   var script = document.currentScript;
-  var projectId = script ? script.getAttribute("projectid") : null;
+  var projectId = script ? script.getAttribute("projectId") : null;
 
   if (!projectId) {
     console.error(
-      "[breadcrumbs-sdk] projectid attribute is required on the script tag",
+      "[breadcrumbs-sdk] projectId attribute is required on the script tag",
     );
     return;
   }

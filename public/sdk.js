@@ -17,7 +17,7 @@
       events.shift();
     }
 
-    console.log("[sdk] event added:", type, data, "total:", events.length);
+    console.log("[breadcrumbs-sdk] event added:", type, data, "total:", events.length);
   }
 
   // Builds a simple selector so we can identify where a click happened.
@@ -55,7 +55,7 @@
   function trackRoute() {
     var path = window.location.pathname;
     addEvent("route", { path: path });
-    console.log("[sdk] route tracked:", path);
+    console.log("[breadcrumbs-sdk] route tracked:", path);
   }
 
   // Track first route when page loads.
@@ -64,7 +64,7 @@
   // Patch pushState so SPA navigations are captured.
   var originalPushState = history.pushState;
   history.pushState = function () {
-    console.log("[sdk] pushState called");
+    console.log("[breadcrumbs-sdk] pushState called");
     var result = originalPushState.apply(this, arguments);
     trackRoute();
     return result;
@@ -82,24 +82,24 @@
       events: events.slice(),
     };
 
-    console.log("[sdk] sending payload to", INGEST_URL, payload);
+    console.log("[breadcrumbs-sdk] sending payload to", INGEST_URL, payload);
     fetch(INGEST_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
       .then(function (res) {
-        console.log("[sdk] ingest response status:", res.status);
+        console.log("[breadcrumbs-sdk] ingest response status:", res.status);
       })
       .catch(function (err) {
         // Ignore network errors to avoid breaking the app.
-        console.log("[sdk] failed to send payload:", err);
+        console.log("[breadcrumbs-sdk] failed to send payload:", err);
       });
   }
 
   // Synchronous errors and classic script errors (not promise rejections).
   window.onerror = function (message, source, lineno, colno, error) {
-    console.log("[sdk] window.onerror triggered:", message);
+    console.log("[breadcrumbs-sdk] window.onerror triggered:", message);
     sendErrorToBackend({
       message: message || (error && error.message) || "",
       stack: error && error.stack ? error.stack : "",
@@ -128,7 +128,7 @@
     } else {
       message = "unhandledrejection";
     }
-    console.log("[sdk] unhandledrejection:", message);
+    console.log("[breadcrumbs-sdk] unhandledrejection:", message);
     sendErrorToBackend({ message: message, stack: stack });
   });
 })();

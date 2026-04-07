@@ -17,7 +17,7 @@
       events.shift();
     }
 
-    console.log("[breadcrumbs-sdk] event added:", type, data, "total:", events.length);
+    console.log("[sdk] event added:", type, data, "total:", events.length);
   }
 
   // Builds a simple selector so we can identify where a click happened.

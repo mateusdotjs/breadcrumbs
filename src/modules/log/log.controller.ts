@@ -38,6 +38,12 @@ export class LogController {
       ) {
         return reply.status(400).send({ ok: false, error: "Invalid payload format." });
       }
+      if (
+        error instanceof Error &&
+        error.message === "projectId is required and must be a string"
+      ) {
+        return reply.status(400).send({ ok: false, error: "projectId is required and must be a string." });
+      }
       throw error;
     }
 

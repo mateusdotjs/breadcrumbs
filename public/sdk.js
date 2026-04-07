@@ -5,6 +5,20 @@
   var BASE_ORIGIN = "http://localhost:3000";
   var INGEST_URL = BASE_ORIGIN + "/api/v1/log";
 
+  // Extract projectId from the script tag
+  var script = document.currentScript;
+  var projectId = script ? script.getAttribute("projectid") : null;
+
+  if (!projectId) {
+    console.error(
+      "[breadcrumbs-sdk] projectid attribute is required on the script tag",
+    );
+    return;
+  }
+
+  // Generate a unique session ID for this page load
+  var sessionId = Crypto.randomUUID();
+
   // Adds an event to memory and keeps only the latest 20 (FIFO).
   function addEvent(type, data) {
     events.push({
@@ -17,7 +31,13 @@
       events.shift();
     }
 
-    console.log("[breadcrumbs-sdk] event added:", type, data, "total:", events.length);
+    console.log(
+      "[breadcrumbs-sdk] event added:",
+      type,
+      data,
+      "total:",
+      events.length,
+    );
   }
 
   // Builds a simple selector so we can identify where a click happened.
@@ -75,6 +95,8 @@
 
   function sendErrorToBackend(errorInfo) {
     var payload = {
+      projectId: projectId,
+      sessionId: sessionId,
       error: {
         message: String(errorInfo.message || ""),
         stack: String(errorInfo.stack || ""),

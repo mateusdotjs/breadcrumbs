@@ -4,10 +4,16 @@ import { Project } from "../projects/projects.model.js";
 export class LogService {
   // Persists one document; Mongoose validates shape against the Log schema.
   async insertLog(payload: unknown, userAgent: string | undefined, referer: string | undefined): Promise<void> {
-    const doc =
+    const doc: any =
       typeof payload === "object" && payload !== null
         ? { ...payload, userAgent, referer }
         : { userAgent, referer };
+
+    // Validate that projectId exists
+    if (!doc.projectId || typeof doc.projectId !== "string") {
+      throw new Error("projectId is required and must be a string");
+    }
+
     await Log.create(doc);
   }
 

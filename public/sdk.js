@@ -17,7 +17,7 @@
   }
 
   // Generate a unique session ID for this page load
-  var sessionId = Crypto.randomUUID();
+  var sessionId = crypto.randomUUID();
 
   // Adds an event to memory and keeps only the latest 20 (FIFO).
   function addEvent(type, data) {

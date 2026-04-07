@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/fastify";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { ProjectsService } from "./projects.service.js";
 import type { CreateProjectBody, UpdateProjectBody } from "./projects.types.js";
+import { UnauthorizedError, NotFoundError, ValidationError } from "../../shared/errors.js";
 
 type CreateProjectRequest = { Body: CreateProjectBody; };
 type UpdateProjectRequest = { Body: UpdateProjectBody; };
@@ -16,12 +17,12 @@ export class ProjectsController {
   ): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     const projects = await this.projectsService.getByCurrentUser(userId);
     if (!projects || projects.length === 0) {
-      return reply.status(404).send({ ok: false, error: "No projects found." });
+      throw new NotFoundError("No projects found");
     }
 
     return reply.send({ ok: true, projects });
@@ -33,12 +34,12 @@ export class ProjectsController {
   ): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     const name = request.body?.name?.trim();
     if (!name) {
-      return reply.status(400).send({ ok: false, error: "name is required." });
+      throw new ValidationError("name is required");
     }
 
     const project = await this.projectsService.create(userId, name);
@@ -51,12 +52,12 @@ export class ProjectsController {
   ): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     const name = request.body?.name?.trim();
     if (!name) {
-      return reply.status(400).send({ ok: false, error: "name is required." });
+      throw new ValidationError("name is required");
     }
 
     const project = await this.projectsService.updateByCurrentUser(
@@ -64,7 +65,7 @@ export class ProjectsController {
       name,
     );
     if (!project) {
-      return reply.status(404).send({ ok: false, error: "Project not found." });
+      throw new NotFoundError("Project not found");
     }
 
     return reply.send({ ok: true, project });
@@ -76,17 +77,17 @@ export class ProjectsController {
   ): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     const projectId = request.params?.id;
     if (!projectId) {
-      return reply.status(400).send({ ok: false, error: "Project ID is required." });
+      throw new ValidationError("Project ID is required");
     }
 
     const project = await this.projectsService.deleteByCurrentUser(userId, projectId);
     if (!project) {
-      return reply.status(404).send({ ok: false, error: "Project not found." });
+      throw new NotFoundError("Project not found");
     }
 
     return reply.send({ ok: true, message: "Project deleted successfully." });

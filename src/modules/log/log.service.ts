@@ -1,5 +1,6 @@
 import { Log } from "./log.model.js";
 import { Project } from "../projects/projects.model.js";
+import { ValidationError, NotFoundError } from "../../shared/errors.js";
 
 export class LogService {
   // Persists one document; Mongoose validates shape against the Log schema.
@@ -11,7 +12,7 @@ export class LogService {
 
     // Validate that projectId exists
     if (!doc.projectId || typeof doc.projectId !== "string") {
-      throw new Error("projectId is required and must be a string");
+      throw new ValidationError("projectId is required and must be a string");
     }
 
     await Log.create(doc);
@@ -24,7 +25,7 @@ export class LogService {
   async getLogsByProjectId(projectId: string, ownerClerkUserId: string): Promise<InstanceType<typeof Log>[]> {
     const project = await Project.findOne({ _id: projectId, ownerClerkUserId }).exec();
     if (!project) {
-      throw new Error("PROJECT_NOT_FOUND_OR_UNAUTHORIZED");
+      throw new NotFoundError("Project not found or unauthorized");
     }
 
     return Log.find({ projectId }).sort({ createdAt: -1 }).exec();
@@ -40,7 +41,7 @@ export class LogService {
     const projectId = logs[0].projectId;
     const project = await Project.findOne({ _id: projectId, ownerClerkUserId }).exec();
     if (!project) {
-      throw new Error("PROJECT_NOT_FOUND_OR_UNAUTHORIZED");
+      throw new NotFoundError("Project not found or unauthorized");
     }
 
     return logs;

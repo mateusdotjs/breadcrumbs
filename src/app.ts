@@ -8,6 +8,7 @@ import { registerLogRoutes } from "./modules/log/log.routes.js";
 import { registerUsersRoutes } from "./modules/users/users.routes.js";
 import { registerProjectsRoutes } from "./modules/projects/projects.routes.js";
 import cors from "@fastify/cors";
+import { errorHandler } from "./shared/error-handler.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,3 +33,6 @@ await app.register(async (apiV1) => {
 await app.register(fastifyStatic, {
   root: path.join(__dirname, "../public"),
 });
+
+// Registrar middleware de erro global
+app.setErrorHandler(errorHandler);

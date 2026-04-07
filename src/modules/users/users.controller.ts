@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/fastify";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { UsersService } from "./users.service.js";
 import type { UpdateCurrentUserBody } from "./users.types.js";
+import { UnauthorizedError } from "../../shared/errors.js";
 
 type UpdateCurrentUserRequest = { Body: UpdateCurrentUserBody; };
 
@@ -11,7 +12,7 @@ export class UsersController {
   getByCurrentUser = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     const user = await this.usersService.getOrCreateByClerkUserId(userId);
@@ -24,7 +25,7 @@ export class UsersController {
   ): Promise<void> => {
     const { userId } = getAuth(request);
     if (!userId) {
-      return reply.status(401).send({ ok: false, error: "Unauthorized." });
+      throw new UnauthorizedError();
     }
 
     // No user fields to update for now

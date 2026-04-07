@@ -21,11 +21,8 @@ export class ProjectsController {
     }
 
     const projects = await this.projectsService.getByCurrentUser(userId);
-    if (!projects || projects.length === 0) {
-      throw new NotFoundError("No projects found");
-    }
 
-    return reply.send({ ok: true, projects });
+    return reply.send({ ok: true, projects: projects || [] });
   };
 
   create = async (

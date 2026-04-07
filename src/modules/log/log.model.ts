@@ -24,6 +24,7 @@ const logSchema = new Schema(
     },
     createdAt: { type: Date, default: Date.now },
     userAgent: { type: String },
+    referer: { type: String },
   },
   { collection: "logs" }
 );

@@ -3,12 +3,12 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import mongoose from "mongoose";
 import { LogService } from "./log.service.js";
 
-type GetLogParams = { Params: { id: string } };
-type GetLogsByProjectParams = { Params: { projectId: string } };
-type GetLogsBySessionParams = { Params: { sessionId: string } };
+type GetLogParams = { Params: { id: string; }; };
+type GetLogsByProjectParams = { Params: { projectId: string; }; };
+type GetLogsBySessionParams = { Params: { sessionId: string; }; };
 
 export class LogController {
-  constructor(private readonly logService: LogService) {}
+  constructor(private readonly logService: LogService) { }
 
   getLog = async (
     request: FastifyRequest<GetLogParams>,
@@ -30,7 +30,7 @@ export class LogController {
 
   postLog = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     try {
-      await this.logService.insertLog(request.body, request.headers["user-agent"]);
+      await this.logService.insertLog(request.body, request.headers["user-agent"], request.headers.referer);
     } catch (error) {
       if (
         error instanceof mongoose.Error.ValidationError ||

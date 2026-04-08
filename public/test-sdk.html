@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test Breadcrumbs SDK</title>
+  </head>
+  <body>
+    <h1>Test Breadcrumbs SDK</h1>
+
+    <!-- Testes de Synchronous Errors -->
+    <h2>Synchronous Errors</h2>
+    <button onclick="testUndefinedError()">Undefined Property Error</button>
+    <button onclick="testNullError()">Null Reference Error</button>
+    <button onclick="testSyntaxError()">Syntax Error</button>
+
+    <!-- Testes de Promise Rejections -->
+    <h2>Promise Rejections</h2>
+    <button onclick="rejectPromise()">Simple Promise Rejection</button>
+    <button onclick="testAsyncAwaitError()">Async/Await Error</button>
+    <button onclick="testThenWithoutCatch()">Then Without Catch</button>
+
+    <!-- Outros testes -->
+    <h2>Other Tests</h2>
+    <button onclick="testTimeoutError()">Error in setTimeout</button>
+    <button onclick="testHandledError()">
+      Handled Error (should NOT be captured)
+    </button>
+
+    <div id="content">Click here to test tracking</div>
+
+    <!-- SDK com projectId -->
+    <script
+      src="http://localhost:3000/sdk.js"
+      projectid="69d56542f22ae66fec14fabd"
+    ></script>
+
+    <script>
+      // Testes de Synchronous Errors
+      function testUndefinedError() {
+        // Variável não declarada
+        variavelNaoExiste.propriedade;
+      }
+
+      function testNullError() {
+        // TypeError em null
+        let obj = null;
+        obj.propriedadeInexistente;
+      }
+
+      function testSyntaxError() {
+        // Erro de sintaxe via eval
+        eval("var a = ");
+      }
+
+      // Testes de Promise Rejections
+      function rejectPromise() {
+        Promise.reject(new Error("Test promise rejection"));
+      }
+
+      function testAsyncAwaitError() {
+        // Async/await sem try/catch
+        async function erroAsync() {
+          throw new Error("erro async sem tratamento");
+        }
+        erroAsync();
+      }
+
+      function testThenWithoutCatch() {
+        // .then() sem .catch()
+        Promise.resolve().then(() => {
+          throw new Error("erro no then sem catch");
+        });
+      }
+
+      // Outros testes
+      function testTimeoutError() {
+        // Erro dentro de setTimeout
+        setTimeout(() => {
+          objetoInexistente.metodo();
+        }, 100);
+      }
+
+      function testHandledError() {
+        // Erro tratado (não deve ser capturado pelo SDK)
+        try {
+          throw new Error("erro tratado no try/catch");
+        } catch (e) {
+          console.log("Erro capturado e tratado:", e.message);
+        }
+      }
+
+      // Teste de clique
+      document.getElementById("content").addEventListener("click", function () {
+        console.log("Content clicked - this should be tracked");
+      });
+    </script>
+  </body>
+</html>

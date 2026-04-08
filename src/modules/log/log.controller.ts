@@ -19,12 +19,12 @@ export class LogController {
     if (!log) {
       throw new NotFoundError("Log not found");
     }
-    return reply.send({ ok: true, log });
+    return reply.send({ data: log });
   };
 
   postLog = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     await this.logService.insertLog(request.body, request.headers["user-agent"], request.headers.referer);
-    return reply.status(201).send({ ok: true });
+    return reply.status(201).send({ data: { message: "Log created successfully." } });
   };
 
   getLogsByProject = async (
@@ -37,7 +37,7 @@ export class LogController {
     }
 
     const logs = await this.logService.getLogsByProjectId(request.params.projectId, userId);
-    return reply.send({ ok: true, logs });
+    return reply.send({ data: logs });
   };
 
   getLogsBySession = async (
@@ -50,6 +50,6 @@ export class LogController {
     }
 
     const logs = await this.logService.getLogsBySessionId(request.params.sessionId, userId);
-    return reply.send({ ok: true, logs });
+    return reply.send({ data: logs });
   };
 }

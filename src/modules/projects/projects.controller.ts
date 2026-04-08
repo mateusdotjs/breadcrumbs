@@ -22,7 +22,7 @@ export class ProjectsController {
 
     const projects = await this.projectsService.getByCurrentUser(userId);
 
-    return reply.send({ ok: true, projects: projects || [] });
+    return reply.send({ data: projects || [] });
   };
 
   create = async (
@@ -40,7 +40,7 @@ export class ProjectsController {
     }
 
     const project = await this.projectsService.create(userId, name);
-    return reply.status(201).send({ ok: true, project });
+    return reply.status(201).send({ data: project });
   };
 
   updateByCurrentUser = async (
@@ -65,7 +65,7 @@ export class ProjectsController {
       throw new NotFoundError("Project not found");
     }
 
-    return reply.send({ ok: true, project });
+    return reply.send({ data: project });
   };
 
   delete = async (
@@ -87,6 +87,6 @@ export class ProjectsController {
       throw new NotFoundError("Project not found");
     }
 
-    return reply.send({ ok: true, message: "Project deleted successfully." });
+    return reply.send({ data: { message: "Project deleted successfully." } });
   };
 }

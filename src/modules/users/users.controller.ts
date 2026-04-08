@@ -16,7 +16,7 @@ export class UsersController {
     }
 
     const user = await this.usersService.getOrCreateByClerkUserId(userId);
-    return reply.send({ ok: true, user });
+    return reply.send({ data: user });
   };
 
   updateByCurrentUser = async (
@@ -30,6 +30,6 @@ export class UsersController {
 
     // No user fields to update for now
     const user = await this.usersService.getOrCreateByClerkUserId(userId);
-    return reply.status(200).send({ ok: true, user });
+    return reply.status(200).send({ data: user });
   };
 }

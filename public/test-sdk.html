@@ -1,97 +1,313 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Test Breadcrumbs SDK</title>
-  </head>
-  <body>
-    <h1>Test Breadcrumbs SDK</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do SDK Breadcrumbs</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-secondary { background: #6c757d; color: white; }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            border-radius: 3px;
+        }
+        .nav-links a:hover {
+            background: #007bff;
+            color: white;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste do SDK Breadcrumbs</h1>
+        <p>Esta página simula um fluxo de e-commerce para testar o rastreamento de eventos do SDK.</p>
 
-    <!-- Testes de Synchronous Errors -->
-    <h2>Synchronous Errors</h2>
-    <button onclick="testUndefinedError()">Undefined Property Error</button>
-    <button onclick="testNullError()">Null Reference Error</button>
-    <button onclick="testSyntaxError()">Syntax Error</button>
+        <!-- Navegação -->
+        <div class="section">
+            <h2>Navegação</h2>
+            <div class="nav-links">
+                <a href="#home" onclick="navigateTo('home')">Home</a>
+                <a href="#products" onclick="navigateTo('products')">Produtos</a>
+                <a href="#cart" onclick="navigateTo('cart')">Carrinho</a>
+                <a href="#checkout" onclick="navigateTo('checkout')">Checkout</a>
+                <a href="#profile" onclick="navigateTo('profile')">Perfil</a>
+            </div>
+        </div>
 
-    <!-- Testes de Promise Rejections -->
-    <h2>Promise Rejections</h2>
-    <button onclick="rejectPromise()">Simple Promise Rejection</button>
-    <button onclick="testAsyncAwaitError()">Async/Await Error</button>
-    <button onclick="testThenWithoutCatch()">Then Without Catch</button>
+        <!-- Produtos -->
+        <div class="section">
+            <h2>Produtos</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="addToCart('iPhone 15', 5999)">Adicionar iPhone 15</button>
+                <button class="btn-primary" onclick="addToCart('MacBook Pro', 12999)">Adicionar MacBook Pro</button>
+                <button class="btn-primary" onclick="addToCart('AirPods', 1299)">Adicionar AirPods</button>
+                <button class="btn-warning" onclick="viewProduct('iPhone 15')">Ver Detalhes</button>
+                <button class="btn-secondary" onclick="searchProducts('iPhone')">Buscar iPhone</button>
+            </div>
+        </div>
 
-    <!-- Outros testes -->
-    <h2>Other Tests</h2>
-    <button onclick="testTimeoutError()">Error in setTimeout</button>
-    <button onclick="testHandledError()">
-      Handled Error (should NOT be captured)
-    </button>
+        <!-- Carrinho -->
+        <div class="section">
+            <h2>Carrinho de Compras</h2>
+            <div class="button-group">
+                <button class="btn-success" onclick="proceedToCheckout()">Finalizar Compra</button>
+                <button class="btn-warning" onclick="updateQuantity()">Alterar Quantidade</button>
+                <button class="btn-danger" onclick="removeItem()">Remover Item</button>
+                <button class="btn-secondary" onclick="applyCoupon()">Aplicar Cupom</button>
+            </div>
+        </div>
 
-    <div id="content">Click here to test tracking</div>
+        <!-- Checkout -->
+        <div class="section">
+            <h2>Checkout</h2>
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" name="name" placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="card">Cartão:</label>
+                    <input type="text" id="card" name="card" placeholder="**** **** **** ****">
+                </div>
+                <div class="form-group">
+                    <label for="installments">Parcelas:</label>
+                    <select id="installments" name="installments">
+                        <option value="1">1x</option>
+                        <option value="2">2x</option>
+                        <option value="3">3x</option>
+                        <option value="6">6x</option>
+                        <option value="12">12x</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-success" onclick="submitPayment()">Pagar Agora</button>
+                    <button type="button" class="btn-secondary" onclick="saveForLater()">Salvar para Depois</button>
+                    <button type="button" class="btn-danger" onclick="cancelPurchase()">Cancelar Compra</button>
+                </div>
+            </form>
+        </div>
 
-    <!-- SDK com projectId -->
+        <!-- Perfil -->
+        <div class="section">
+            <h2>Perfil do Usuário</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="editProfile()">Editar Perfil</button>
+                <button class="btn-secondary" onclick="changePassword()">Alterar Senha</button>
+                <button class="btn-secondary" onclick="viewOrders()">Ver Pedidos</button>
+                <button class="btn-warning" onclick="configureNotifications()">Configurar Notificações</button>
+                <button class="btn-danger" onclick="deleteAccount()">Excluir Conta</button>
+            </div>
+        </div>
+
+        <!-- Testes de Erro -->
+        <div class="section">
+            <h2>Testes de Erro (para gerar logs)</h2>
+            <div class="button-group">
+                <button class="btn-danger" onclick="testUndefinedError()">Erro Undefined</button>
+                <button class="btn-danger" onclick="testNullError()">Erro Null</button>
+                <button class="btn-danger" onclick="testAsyncError()">Erro Async</button>
+                <button class="btn-danger" onclick="testPromiseError()">Erro Promise</button>
+                <button class="btn-danger" onclick="testNetworkError()">Erro de Rede</button>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <!-- SDK do Breadcrumbs -->
     <script
       src="http://localhost:3000/sdk.js"
-      projectid="69d56542f22ae66fec14fabd"
+      projectId="69d56542f22ae66fec14fabd"
     ></script>
 
     <script>
-      // Testes de Synchronous Errors
-      function testUndefinedError() {
-        // Variável não declarada
-        variavelNaoExiste.propriedade;
-      }
-
-      function testNullError() {
-        // TypeError em null
-        let obj = null;
-        obj.propriedadeInexistente;
-      }
-
-      function testSyntaxError() {
-        // Erro de sintaxe via eval
-        eval("var a = ");
-      }
-
-      // Testes de Promise Rejections
-      function rejectPromise() {
-        Promise.reject(new Error("Test promise rejection"));
-      }
-
-      function testAsyncAwaitError() {
-        // Async/await sem try/catch
-        async function erroAsync() {
-          throw new Error("erro async sem tratamento");
+        // Funções de teste do fluxo
+        function navigateTo(page) {
+            showStatus(`Navegando para ${page}`, 'success');
+            // Simula mudança de rota
+            history.pushState({}, '', `/${page}`);
         }
-        erroAsync();
-      }
 
-      function testThenWithoutCatch() {
-        // .then() sem .catch()
-        Promise.resolve().then(() => {
-          throw new Error("erro no then sem catch");
-        });
-      }
-
-      // Outros testes
-      function testTimeoutError() {
-        // Erro dentro de setTimeout
-        setTimeout(() => {
-          objetoInexistente.metodo();
-        }, 100);
-      }
-
-      function testHandledError() {
-        // Erro tratado (não deve ser capturado pelo SDK)
-        try {
-          throw new Error("erro tratado no try/catch");
-        } catch (e) {
-          console.log("Erro capturado e tratado:", e.message);
+        function addToCart(product, price) {
+            showStatus(`${product} adicionado ao carrinho - R$ ${price}`, 'success');
         }
-      }
 
-      // Teste de clique
-      document.getElementById("content").addEventListener("click", function () {
-        console.log("Content clicked - this should be tracked");
-      });
+        function viewProduct(product) {
+            showStatus(`Visualizando detalhes de ${product}`, 'success');
+        }
+
+        function searchProducts(term) {
+            showStatus(`Buscando por: ${term}`, 'success');
+        }
+
+        function proceedToCheckout() {
+            showStatus('Iniciando checkout', 'success');
+            document.getElementById('checkout-form').scrollIntoView();
+        }
+
+        function updateQuantity() {
+            showStatus('Alterando quantidade do item', 'success');
+        }
+
+        function removeItem() {
+            showStatus('Item removido do carrinho', 'success');
+        }
+
+        function applyCoupon() {
+            showStatus('Aplicando cupom de desconto', 'success');
+        }
+
+        function submitPayment() {
+            showStatus('Processando pagamento...', 'success');
+        }
+
+        function saveForLater() {
+            showStatus('Compra salva para depois', 'success');
+        }
+
+        function cancelPurchase() {
+            showStatus('Compra cancelada', 'success');
+        }
+
+        function editProfile() {
+            showStatus('Editando perfil', 'success');
+        }
+
+        function changePassword() {
+            showStatus('Alterando senha', 'success');
+        }
+
+        function viewOrders() {
+            showStatus('Visualizando pedidos', 'success');
+        }
+
+        function configureNotifications() {
+            showStatus('Configurando notificações', 'success');
+        }
+
+        function deleteAccount() {
+            showStatus('Excluindo conta', 'error');
+        }
+
+        // Funções para gerar erros
+        function testUndefinedError() {
+            showStatus('Gerando erro undefined...', 'error');
+            setTimeout(() => {
+                objetoInexistente.propriedade; // Isso vai gerar erro
+            }, 100);
+        }
+
+        function testNullError() {
+            showStatus('Gerando erro null...', 'error');
+            setTimeout(() => {
+                let obj = null;
+                obj.propriedadeInexistente; // Isso vai gerar erro
+            }, 100);
+        }
+
+        function testAsyncError() {
+            showStatus('Gerando erro async...', 'error');
+            setTimeout(async () => {
+                throw new Error('Erro em função async');
+            }, 100);
+        }
+
+        function testPromiseError() {
+            showStatus('Gerando erro promise...', 'error');
+            setTimeout(() => {
+                Promise.reject(new Error('Promise rejeitada'));
+            }, 100);
+        }
+
+        function testNetworkError() {
+            showStatus('Gerando erro de rede...', 'error');
+            setTimeout(() => {
+                fetch('http://url-inexistente.com/api');
+            }, 100);
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        // Log inicial
+        console.log('Página de teste do SDK carregada');
     </script>
-  </body>
+</body>
 </html>

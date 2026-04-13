@@ -46,4 +46,8 @@ export class LogService {
 
     return logs;
   }
+
+  async deleteLogsByProjectId(projectId: string): Promise<void> {
+    await Log.deleteMany({ projectId }).exec();
+  }
 }

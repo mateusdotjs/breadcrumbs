@@ -11,15 +11,7 @@ export function registerLogRoutes(app: FastifyInstance): void {
 
   // Routes are mounted under the global API prefix (e.g. `/api/v1`).
   app.get("/log/:id", controller.getLog);
-  app.post("/log", {
-    config: {
-      cors: {
-        origin: "*",
-        methods: ["POST"],
-        allowedHeaders: ["Content-Type"],
-      }
-    }
-  }, controller.postLog);
+  app.post("/log", controller.postLog);
   app.get("/logs/project/:projectId", controller.getLogsByProject);
   app.get("/logs/session/:sessionId", controller.getLogsBySession);
 }

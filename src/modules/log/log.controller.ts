@@ -15,6 +15,11 @@ export class LogController {
     request: FastifyRequest<GetLogParams>,
     reply: FastifyReply
   ): Promise<void> => {
+    const { userId } = getAuth(request);
+    if (!userId) {
+      throw new UnauthorizedError();
+    }
+
     const log = await this.logService.getLogById(request.params.id);
     if (!log) {
       throw new NotFoundError("Log not found");

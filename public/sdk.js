@@ -70,6 +70,78 @@
     );
   }
 
+  // Clean text by removing newlines and normalizing spaces
+  function cleanText(text) {
+    if (!text || typeof text !== "string") return "";
+    return text
+      .replace(/\n+/g, " ") // Replace newlines with spaces
+      .replace(/\s+/g, " ") // Replace multiple spaces with single space
+      .trim(); // Remove leading/trailing spaces
+  }
+
+  // Get enhanced description for input elements
+  function getInputDescription(el) {
+    if (!el || el.tagName.toLowerCase() !== "input") return null;
+
+    var description = [];
+
+    // Priority: aria-label > placeholder > name > id > type
+    if (el.getAttribute("aria-label")) {
+      description.push(
+        "aria-label '" + cleanText(el.getAttribute("aria-label")) + "'",
+      );
+    }
+    if (el.getAttribute("aria-placeholder")) {
+      description.push(
+        "aria-placeholder '" +
+          cleanText(el.getAttribute("aria-placeholder")) +
+          "'",
+      );
+    }
+    if (el.placeholder) {
+      description.push("placeholder '" + cleanText(el.placeholder) + "'");
+    }
+    if (el.name) {
+      description.push("name '" + el.name + "'");
+    }
+    if (el.id) {
+      description.push("id '" + el.id + "'");
+    }
+    if (el.type && el.type !== "text") {
+      description.push("type '" + el.type + "'");
+    }
+
+    return description.length > 0 ? description.join(" ") : null;
+  }
+
+  // Get enhanced description for list items
+  function getListItemDescription(el) {
+    if (!el || el.tagName.toLowerCase() !== "li") return null;
+
+    var description = [];
+
+    // Priority: aria-label > role > id > class
+    if (el.getAttribute("aria-label")) {
+      description.push(
+        "aria-label '" + cleanText(el.getAttribute("aria-label")) + "'",
+      );
+    }
+    if (el.getAttribute("role")) {
+      description.push("role '" + el.getAttribute("role") + "'");
+    }
+    if (el.id) {
+      description.push("id '" + el.id + "'");
+    }
+    if (el.className && typeof el.className === "string") {
+      var classes = el.className.trim().split(/\s+/);
+      if (classes.length > 0) {
+        description.push("class '" + classes[0] + "'");
+      }
+    }
+
+    return description.length > 0 ? description.join(" ") : null;
+  }
+
   // Builds a simple selector so we can identify where a click happened.
   function getSelector(el) {
     if (!el) return "";
@@ -91,12 +163,27 @@
       var tag = (el.tagName || "").toLowerCase();
       if (tag === "html" || tag === "body") return;
 
-      var text = (el.innerText || "").trim().slice(0, 30);
-      addEvent("click", {
+      var text = cleanText(el.innerText || "").slice(0, 30);
+      var clickData = {
         tag: tag,
         text: text,
         selector: getSelector(el),
-      });
+      };
+
+      // Add enhanced descriptions for specific elements
+      if (tag === "input") {
+        var inputDesc = getInputDescription(el);
+        if (inputDesc) {
+          clickData.inputDescription = inputDesc;
+        }
+      } else if (tag === "li") {
+        var listDesc = getListItemDescription(el);
+        if (listDesc) {
+          clickData.listItemDescription = listDesc;
+        }
+      }
+
+      addEvent("click", clickData);
     },
     true,
   );

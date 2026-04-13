@@ -147,10 +147,7 @@
             "
             >Checkout</a
           >
-          <a
-            href="/profile"
-            >Perfil</a
-          >
+          <a href="/profile">Perfil</a>
         </div>
       </div>
 
@@ -174,6 +171,38 @@
             Buscar iPhone
           </button>
         </div>
+
+        <!-- Lista de produtos com ARIA -->
+        <h3>Lista de Produtos (Clique para testar)</h3>
+        <ul style="list-style: none; padding: 0">
+          <li
+            onclick="showStatus('iPhone 15 selecionado', 'success')"
+            aria-label="iPhone 15 - Produto selecionável"
+            role="option"
+            class="btn-primary"
+            style="margin: 5px 0; padding: 10px; cursor: pointer"
+          >
+            iPhone 15
+          </li>
+          <li
+            onclick="showStatus('MacBook Pro selecionado', 'success')"
+            aria-label="MacBook Pro - Produto premium"
+            role="option"
+            class="btn-primary"
+            style="margin: 5px 0; padding: 10px; cursor: pointer"
+          >
+            MacBook Pro
+          </li>
+          <li
+            onclick="showStatus('AirPods selecionado', 'success')"
+            aria-label="AirPods - Fones sem fio"
+            role="option"
+            class="btn-primary"
+            style="margin: 5px 0; padding: 10px; cursor: pointer"
+          >
+            AirPods
+          </li>
+        </ul>
       </div>
 
       <!-- Carrinho -->
@@ -206,11 +235,20 @@
               id="email"
               name="email"
               placeholder="seu@email.com"
+              aria-label="Campo de email para cadastro"
             />
           </div>
           <div class="form-group">
             <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" placeholder="Seu nome" />
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Digite seu
+nome  
+completo"
+              aria-label="Nome completo do usuário"
+            />
           </div>
           <div class="form-group">
             <label for="card">Cartão:</label>
@@ -219,6 +257,7 @@
               id="card"
               name="card"
               placeholder="**** **** **** ****"
+              aria-label="Número do cartão de crédito"
             />
           </div>
           <div class="form-group">

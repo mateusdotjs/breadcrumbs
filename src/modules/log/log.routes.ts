@@ -1,12 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { LogController } from "./log.controller.js";
 import { LogService } from "./log.service.js";
-import { DatabaseFactory } from "../../shared/database/factory/DatabaseFactory.js";
 
 export function registerLogRoutes(app: FastifyInstance): void {
-  // Create repository and service
-  const logRepository = DatabaseFactory.createLogRepository();
-  const logService = new LogService(logRepository);
+  // Create service
+  const logService = new LogService();
   const controller = new LogController(logService);
 
   // Routes are mounted under the global API prefix (e.g. `/api/v1`).

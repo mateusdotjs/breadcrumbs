@@ -1,23 +1,25 @@
 import { Project } from "./projects.model.js";
-import { ProjectRepository } from "../../shared/database/interfaces/ProjectRepository.js";
 import { LogService } from "../log/log.service.js";
 
 export class ProjectsService {
   constructor(
-    private readonly projectRepository: ProjectRepository,
     private readonly logService: LogService
   ) { }
 
   async getByCurrentUser(ownerClerkUserId: string): Promise<any[]> {
-    return this.projectRepository.getByCurrentUser(ownerClerkUserId);
+    return Project.find({ ownerClerkUserId });
   }
 
   async create(ownerClerkUserId: string, name: string): Promise<InstanceType<typeof Project>> {
-    return this.projectRepository.create(ownerClerkUserId, name);
+    return Project.create({ ownerClerkUserId, name: name.trim() });
   }
 
   async updateByCurrentUser(ownerClerkUserId: string, name: string): Promise<InstanceType<typeof Project> | null> {
-    return this.projectRepository.updateByCurrentUser(ownerClerkUserId, name);
+    return Project.findOneAndUpdate(
+      { ownerClerkUserId },
+      { name: name.trim() },
+      { new: true, runValidators: true }
+    );
   }
 
   async deleteByCurrentUser(ownerClerkUserId: string, projectId: string): Promise<InstanceType<typeof Project> | null> {
@@ -25,6 +27,9 @@ export class ProjectsService {
     await this.logService.deleteLogsByProjectId(projectId);
 
     // Then delete the project
-    return this.projectRepository.deleteByCurrentUser(ownerClerkUserId, projectId);
+    return Project.findOneAndDelete({
+      _id: projectId,
+      ownerClerkUserId,
+    });
   }
 }

@@ -10,32 +10,26 @@ Breadcrumbs is an error monitoring system that collects breadcrumb events and er
 - **Event Tracking**: Captures sequence of events (breadcrumbs) leading to errors
 - **Structured Storage**: Persists data in MongoDB for later analysis
 - **RESTful API**: Simple endpoint for frontend SDK integration
+- **User Management**: Handles user authentication and project management
+- **Project Organization**: Organizes error logs by projects
 
 ## 🏗️ Architecture & Tech Stack
 
 - **Backend**: Node.js + TypeScript (type-safe)
 - **Web Framework**: Fastify (high performance)
 - **Database**: MongoDB (flexible and scalable)
-- **Modular Architecture**: Clean structure with separation of concerns
+- **Modular Architecture**: Clean structure with separation of concerns following modules, routes, controllers, and services pattern
 
 ## 📁 Project Structure
 
-```text
-src/
-├── app.ts          # Main Fastify configuration
-├── server.ts       # Server entry point
-├── config/
-│   └── database.ts # MongoDB configuration
-├── modules/
-│   └── log/
-│       ├── log.routes.ts    # API routes
-│       ├── log.controller.ts # Controller logic
-│       ├── log.service.ts    # Business logic
-│       └── log.model.ts      # MongoDB schema
-└── shared/
-    ├── errors/     # Error handling
-    └── middlewares/ # Global middlewares
-```
+The application follows a modular architecture pattern with clear separation of concerns:
+
+- **Modules**: Each business domain (log, projects, users) has its own module
+- **Controllers**: Handle HTTP requests and responses
+- **Services**: Contain business logic and data processing
+- **Models**: Define MongoDB schemas and data structures
+- **Routes**: Define API endpoints and routing logic
+- **Types**: TypeScript type definitions for each module
 
 ## 📋 Prerequisites
 
@@ -80,13 +74,11 @@ cp .env.example .env
 The `.env` file should contain:
 
 ```bash
-
-# Clerk Authentication
-CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
-CLERK_SECRET_KEY=your_clerk_secret_key_here
+PORT=3000
+HOST=0.0.0.0
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB_NAME=breadcrumbs
 ```
-
-**Important**: You need to create a Clerk account at [clerk.com](https://clerk.com) to get your authentication keys.
 
 ### 5. Start Development Server
 
